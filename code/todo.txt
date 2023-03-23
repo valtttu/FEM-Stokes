@@ -1,0 +1,7 @@
+TODO list for the code:
+
+Valtteri 23.2.2023:
+	- Implement some higher abstraction for the boundaries, of the form mesh.bdof(k)
+	  that returns the edges of tau_h corresponding to k:th face of omega. This should
+	  allow defining non-square domains and still access boundaries easily. Modifications
+	  will be made to inittri.m and make_rect_mesh.m

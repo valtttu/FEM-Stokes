@@ -9,7 +9,7 @@ mesh = make_rect_mesh(0);
 % The number of elements
 Nt = size(mesh.t, 2);
 Ne = size(mesh.edges, 2);
-n = 2*Nt + 2*Ne; % The number of dof for u
+n = Nt + Ne; % The number of dof for u
 
 % Extract the node coordinates
 px = mesh.p(1,:);
@@ -27,27 +27,37 @@ end
 
 
 %% Demo assembly and indexing
-% Loop over the elements
-A = zeros([n, n]);
-B = zeros([n, Nt]);
+% Loop over the elements (interiors in tau_h)
+A = zeros([2*n, 2*n]);
+B = zeros([2*n, Nt]);
+idof = mesh.idof;
+edof = mesh.edof;
 for i = 1:Nt
     
-    % Compute interior contribution to A from T_i
-    A(mesh.idof(i,1), mesh.idof(i,1)) = 1; % u_x
-    A(mesh.idof(i,2), mesh.idof(i,2)) = 1; % u_y
+    for k = 1:2 % Both components of u
+        % Compute interior contribution to A from T_i
+        A(idof(i,k), idof(i,k)) = A(idof(i,k), idof(i,k)) + 1; % nabla phi_i * nabla phi_i
+    
+        % Compute edge contribution to A from T_i and edges of T_i
+        for j = 1:3
+            A(idof(i,k), edof(i,j,k)) = A(idof(i,k), edof(i,j,k)) + 1; % nabla phi_i * nabla psi_j
+            A(edof(i,j,k), idof(i,k)) = A(edof(i,j,k), idof(i,k)) + 1; % nabla psi_i * nabla phi_j
 
-    % Compute edge contribution to A from T_i
-    for j = 1:3
-        A(mesh.edof(i,j,1), mesh.edof(i,j,1)) = A(mesh.edof(i,j,1), mesh.edof(i,j,1)) + 1; % u_x
-        A(mesh.edof(i,j,2), mesh.edof(i,j,2)) = A(mesh.edof(i,j,2), mesh.edof(i,j,2)) + 1; % u_y
+            % Compute edge edge contribution to A
+            A(edof(i,j,k), edof(i,j,k)) = A(edof(i,j,k), edof(i,j,k)) + 1; % nabla psi_i * nabla psi_i
+        end
+
     end
 
-    % Compute interior to B
-    B(mesh.idof(i,1), mesh.idof(i,1)) = 1; % p (scalar)
+    % Compute the contributions to B (edge and interior contribution only)
+    % only for k=1, since p is scalar
+    for j = 1:3
+        B(mesh.edof(i,j,1), mesh.idof(i,1)) = B(mesh.edof(i,j,1), mesh.idof(i,1)) + 1; % (nabla * psi_i) phi_j
+    end
 
 end
 
 % Construct the saddle point system
 M = [A, -B; B',zeros(Nt)];
-b = zeros([n+Nt,1]);
+b = zeros([2*n+Nt,1]);
 u = M\b;
