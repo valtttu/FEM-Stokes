@@ -1,0 +1,14 @@
+This folder contains openFOAM simulation for lid-driven cavity problem on domain (0,1)^2 with Re = 1.
+
+Boundary conditions are 
+	U(x,1) = (1,0)
+	U(x,0) = (0,0)
+	U(0,y) = (0,0)
+	U(1,y) = (0,0)
+	
+	dp(x,1) = 0		dp = nabla(p)
+	dp(x,0) = 0
+	dp(0,y) = 0
+	dp(1,y) = 0 	with constraint p(0,0) = 0
+	
+	
