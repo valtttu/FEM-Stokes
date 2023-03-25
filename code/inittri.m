@@ -84,3 +84,4 @@ edof = zeros([Nt,3,2]);
 edof(:,:,1) = 2*Nt + mesh.t2e';
 edof(:,:,2) = 2*Nt + max(mesh.t2e, [], 'all') + mesh.t2e';
 mesh.edof = edof;
+

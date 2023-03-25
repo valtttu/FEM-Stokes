@@ -1,0 +1,46 @@
+#
+#	Mesh generation tool input file for FEM Stokes solver
+#
+#	This is a simple example of a domain that has a 90deg corner shown below
+#	
+#	7--6--5
+#	|  |  |
+#	3--2--4
+#	|  |
+#	0--1
+#
+#	Boundary conditions are se by defining the end points of the boundary and giving the
+#	ux and uy components.
+#	The order of keywords doesn't matter, but the syntax for keyword is strict kw\n{\n values \n}
+
+
+points
+{
+	0 0
+	1 0
+	1 1
+	0 1
+	2 1
+	2 2
+	1 2
+	0 2
+}
+
+blocks
+{
+	0 1 2 3
+	3 2 6 7
+	2 4 5 6
+}
+
+bc
+{
+	0 1 0 -1
+	1 2 0 0
+	2 4 0 0
+	4 5 1 0
+	5 6 0 0
+	6 7 0 0
+	7 3 0 0
+	3 0 0 0 
+}

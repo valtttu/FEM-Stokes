@@ -3,8 +3,11 @@
 clear all;
 close all;
 
-%% Init a (0,1)^2 rect mesh
-mesh = make_rect_mesh(0);
+%% Initialize a mesh
+% Option 1: Rect mesh on (0,1)^2
+%mesh = make_rect_mesh(1);
+% Option 2: A more complex mesh from input file
+mesh = build_mesh('blocks.txt',2);
 
 % The number of elements
 Nt = size(mesh.t, 2);
@@ -24,7 +27,6 @@ for i = 1:Ne
         plot(px(node), py(node), 'k-')
     end
 end
-
 
 %% Demo assembly and indexing
 % Loop over the elements (interiors in tau_h)
@@ -58,6 +60,11 @@ for i = 1:Nt
 end
 
 % Construct the saddle point system
+bdof = mesh.bdof;
+bvals = mesh.bvals;
+iidof = setdiff(1:2*n, bdof);
 M = [A, -B; B',zeros(Nt)];
 b = zeros([2*n+Nt,1]);
-u = M\b;
+u(iidof) = M(iidof, iidof)\b(iidof);
+u(bdof) = bvals;
+

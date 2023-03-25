@@ -32,3 +32,29 @@ mesh = inittri(p,t);
 for i=1:N
   mesh = refine_tri(mesh);
 end
+
+
+% Add the boundary conditions
+out_inds = find(mesh.e2t(2,:) == 0);
+out_edges = mesh.edges(:,out_inds);
+out_ts = unique(mesh.e2t(1,out_inds(:)));
+bdof = [];
+bvals = [];
+for i = 1:length(out_ts)
+    % Go over the edges of triangle i
+    for j = 1:3
+        if(sum(mesh.t2e(j, i) == out_inds) == 1)
+            eind = mesh.t2e(j, i) == out_inds;
+            ei = j;
+      
+            % Append the set of all outer edge indices
+            bdof(end+1) = mesh.edof(i,ei,1);
+            bdof(end+1) = mesh.edof(i,ei,2);
+    
+        end
+    end
+
+end
+
+mesh.bdof = bdof;
+mesh.bvals = zeros(size(bdof));
