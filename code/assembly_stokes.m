@@ -25,15 +25,15 @@ end
 
 function res = grad_phi(mesh,T) % triangle inside
     x_T = centroid(mesh,T);
-    C_T = 2*triangle_area(mesh,T) / norm(x-x_T)^2;
-    res = @(x) -C_T * (x-x_T);
+    C_T = @(x) 2*triangle_area(mesh,T) / norm(x-x_T)^2;
+    res = @(x) -C_T(x) * (x-x_T);
 end
 
 function res = grad_psi(mesh,T,E)
     x_T = centroid(mesh,T);
     absT = triangle_area(mesh,T);
-    C_T = 2*absT / norm(x-x_T)^2;
-    res = @(x) C_T/3 * (x-x_T) + edge_length(mesh,E)/absT * edge_normal(mesh,T,E);
+    C_T = @(x) 2*absT / norm(x-x_T)^2;
+    res = @(x) C_T(x)/3 * (x-x_T) + edge_length(mesh,E)/absT * edge_normal(mesh,T,E);
 end
 
 function c = centroid(mesh,T)
@@ -64,8 +64,7 @@ end
 
 function len = edge_length(mesh,E)
     edge_coord = mesh.p(:,mesh.edges(:,E));
-    edge_vector = edge_coord(:,2) - edge_coord(:,1);
-    len = norm(edge_vector);
+    len = norm(edge_coord(:,2) - edge_coord(:,1));
 end
 
 function res = inner_prod(a,b,mesh,T) % int_T a' * b dx 
