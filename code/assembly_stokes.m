@@ -80,3 +80,13 @@ function res = inner_prod(a,b,mesh,T) % int_T a' * b dx
         a(qpts(:,3))' * b(qpts(:,3));
     res = A * triangle_area(mesh,T) / 3;
 end
+
+function res = hannukainen_quad2(a, b, mesh, T)
+    % Calculate quad points and weights
+    vertices = mesh.p(:, mesh.t(:, T));
+    next = [vertices(:, 2:end), vertices(:, 1)];
+    t = vertices + 1/2 * (next-vertices);
+    w = triangle_area(mesh, T)*[1/3 1/3 1/3];
+    % Operate
+    res = w*(a(t).*b(t))';
+end
