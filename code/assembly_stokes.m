@@ -71,10 +71,9 @@ function res = inner_prod(a,b,mesh,T) % int_T a' * b dx
     % simple center point integral
     % could made better with quadrature rules?
     corner_coord = mesh.p(:,mesh.t(:,T));
-    M = [2/3  1/6  1/6;
-         1/6  2/3  1/6;
-         1/6  1/6  2/3];
-    qpts = [(M*corner_coord(1,:)')' ; (M*corner_coord(2,:)')'];
+    qpts = corner_coord*[2/3  1/6  1/6;
+                         1/6  2/3  1/6;
+                         1/6  1/6  2/3];
     A = a(qpts(:,1))' * b(qpts(:,1)) +...
         a(qpts(:,2))' * b(qpts(:,2)) +...
         a(qpts(:,3))' * b(qpts(:,3));
