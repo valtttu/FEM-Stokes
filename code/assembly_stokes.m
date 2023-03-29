@@ -8,7 +8,7 @@ end
 
 % GP1 = grad_psi(mesh,T1,E1)
 % GP2 = grad_psi(mesh,T2,E2)
-% A_{i,j} = inner_prod(GP1,GP2,mesh,T1);
+% A_{i,j} = inner_prod(GP1,GP2,mesh,T1)
 
 % GP1 and GP2 are function handles, and T1, T2, E1, E2 correspond to basis functions i and j
 
@@ -16,10 +16,11 @@ function res = div_phi()
     res = @(x) 0;
 end
 
-function res = div_psi(mesh,T,E) % non-zero only for triangles that share edge e_i
-    % TODO!!! Psi_{i,j,b} ???
-    %psi = ???
-    res = @(x) 1/triangle_area(mesh,T) * (psi) * edge_normal(mesh,T,E) * edge_length(mesh,E);
+function res = div_psi(mesh,T,E,j) % non-zero only for triangles that share edge e_i
+    % j \in {1,2} gives the velocity's different components:
+    % j=1 gives x, j=2 gives y
+    n = edge_normal(mesh,T,E);
+    res = @(x) 1 / triangle_area(mesh,T) * n(j) * edge_length(mesh,E);
 end
 
 function res = grad_phi(mesh,T) % triangle inside
