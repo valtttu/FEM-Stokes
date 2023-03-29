@@ -13,7 +13,7 @@ function [A,B] = assembly_stokes(mesh)
         inner1 = inner_prod(GPhi, GPhi, mesh, i);
         for k = 1:2 % Both components of u
             % Compute interior contribution to A from T_i
-            A(idof(i,k), idof(i,k)) = A(idof(i,k), idof(i,k)) + inner1(k); % nabla phi_i * nabla phi_i
+            A(idof(i,k), idof(i,k)) = A(idof(i,k), idof(i,k)) + inner1; % nabla phi_i * nabla phi_i
         
             % Compute edge contribution to A from T_i and edges of T_i
             for j = 1:3
@@ -21,11 +21,11 @@ function [A,B] = assembly_stokes(mesh)
                 inner2 = inner_prod(GPhi, GPsi, mesh, i);
                 inner3 = inner_prod(GPsi, GPhi, mesh, i);
                 inner4 = inner_prod(GPsi, GPsi, mesh, i);
-                A(idof(i,k), edof(i,j,k)) = A(idof(i,k), edof(i,j,k)) + inner2(k); % nabla phi_i * nabla psi_j
-                A(edof(i,j,k), idof(i,k)) = A(edof(i,j,k), idof(i,k)) + inner3(k); % nabla psi_i * nabla phi_j
+                A(idof(i,k), edof(i,j,k)) = A(idof(i,k), edof(i,j,k)) + inner2; % nabla phi_i * nabla psi_j
+                A(edof(i,j,k), idof(i,k)) = A(edof(i,j,k), idof(i,k)) + inner3; % nabla psi_i * nabla phi_j
     
                 % Compute edge edge contribution to A
-                A(edof(i,j,k), edof(i,j,k)) = A(edof(i,j,k), edof(i,j,k)) + inner4(k); % nabla psi_i * nabla psi_i
+                A(edof(i,j,k), edof(i,j,k)) = A(edof(i,j,k), edof(i,j,k)) + inner4; % nabla psi_i * nabla psi_i
             end
 
         end
@@ -33,8 +33,8 @@ function [A,B] = assembly_stokes(mesh)
         % Compute the contributions to B (edge and interior contribution only)
         % only for k=1, since p is scalar
         for j = 1:3
-            DPsi_j = div_psi(mesh, i, mesh.t2e(j, i), j);
-            inner5 = inner_prod(DPsi_j, @(x) ones(size(x)), mesh, i);
+            DPsi_j = div_psi(mesh, i, mesh.t2e(j, i), 1);
+            inner5 = inner_prod(DPsi_j, @(x) ones(size(x,2)), mesh, i);
             B(mesh.edof(i,j,1), mesh.idof(i,1)) = B(mesh.edof(i,j,1), mesh.idof(i,1)) + inner5; % (nabla * psi_i) phi_j
         end
     end
@@ -58,7 +58,7 @@ function res = div_psi(mesh,T,E,j) % non-zero only for triangles that share edge
     % j \in {1,2} gives the velocity's different components:
     % j=1 gives x, j=2 gives y
     n = edge_normal(mesh,T,E);
-    res = @(x) 1 / triangle_area(mesh,T) * n(j) * edge_length(mesh,E);
+    res = @(x) 0*norm(x) + 1 / triangle_area(mesh,T) * n(j) * edge_length(mesh,E);
 end
 
 function res = grad_phi(mesh,T) % triangle inside
@@ -112,9 +112,9 @@ function res = inner_prod(a,b,mesh,T) % int_T a' * b dx
     qpts = corner_coord*[2/3  1/6  1/6;
                          1/6  2/3  1/6;
                          1/6  1/6  2/3];
-    A = a(qpts(1,:))' * b(qpts(1,:)) +...
-        a(qpts(2,:))' * b(qpts(2,:)) +...
-        a(qpts(3,:))' * b(qpts(3,:));
+    A = a(qpts(:,1))' * b(qpts(:,1)) +...
+        a(qpts(:,2))' * b(qpts(:,2)) +...
+        a(qpts(:,3))' * b(qpts(:,3));
     res = A * triangle_area(mesh,T) / 3;
 end
 
