@@ -7,7 +7,7 @@ close all;
 % Option 1: Rect mesh on (0,1)^2
 %mesh = make_rect_mesh(1);
 % Option 2: A more complex mesh from input file
-mesh = build_mesh('blocks.txt',2);
+mesh = build_mesh('./domains/cavity_domain.txt',3);
 
 % The number of elements
 Nt = size(mesh.t, 2);
@@ -62,7 +62,7 @@ end
 % Construct the saddle point system
 bdof = mesh.bdof;
 bvals = mesh.bvals;
-iidof = setdiff(1:2*n, bdof);
+iidof = setdiff(1:(2*n + Nt), bdof);
 M = [A, -B; B',zeros(Nt)];
 b = zeros([2*n+Nt,1]);
 u(iidof) = M(iidof, iidof)\b(iidof);

@@ -69,14 +69,15 @@ function mesh = build_mesh(path, N)
     bvals = [];
     for i = 1:length(out_ts)
         % Go over the edges of triangle i
+        ti = out_ts(i);
         for j = 1:3
-            if(sum(mesh.t2e(j, i) == out_inds) == 1)
-                eind = mesh.t2e(j, i) == out_inds;
+            if(sum(mesh.t2e(j, ti) == out_inds) == 1)
+                eind = mesh.t2e(j, ti) == out_inds;
                 ei = j;
           
                 % Append the set of all outer edge indices
-                bdof(end+1) = mesh.edof(i,ei,1);
-                bdof(end+1) = mesh.edof(i,ei,2);
+                bdof(end+1) = mesh.edof(ti,ei,1);
+                bdof(end+1) = mesh.edof(ti,ei,2);
         
                 % Set the bounary values
                 x = mean(mesh.p(1,out_edges(:,eind)));
