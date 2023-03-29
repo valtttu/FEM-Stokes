@@ -1,5 +1,44 @@
 function [A,B] = assembly_stokes(mesh,T,E)
-    %%% TODO
+    % The number of elements
+    Nt = size(mesh.t, 2);
+    Ne = size(mesh.edges, 2);
+    n = Nt + Ne; % The number of dof for u
+
+    A = zeros([2*n, 2*n]);
+    B = zeros([2*n, Nt]);
+    idof = mesh.idof;
+    edof = mesh.edof;
+    for i = 1:Nt
+        GPhi = grad_phi(mesh, mesh.t(:, i));
+        GPsi = grad_psi(mesh, mesh.t(:, i), mesh.e(:, i));
+
+        inner1 = inner_prod(GPhi, GPhi, mesh, mesh.t(:, i));
+        inner2 = inner_prod(GPhi, GPsi, mesh, mesh.t(:, i));
+        inner3 = inner_prod(GPsi, GPhi, mesh, mesh.t(:, i));
+        inner4 = inner_prod(GPsi, GPsi, mesh, mesh.t(:, i));
+        for k = 1:2 % Both components of u
+            % Compute interior contribution to A from T_i
+            A(idof(i,k), idof(i,k)) = A(idof(i,k), idof(i,k)) + inner1(k); % nabla phi_i * nabla phi_i
+        
+            % Compute edge contribution to A from T_i and edges of T_i
+            for j = 1:3
+                A(idof(i,k), edof(i,j,k)) = A(idof(i,k), edof(i,j,k)) + inner2(k); % nabla phi_i * nabla psi_j
+                A(edof(i,j,k), idof(i,k)) = A(edof(i,j,k), idof(i,k)) + inner3(k); % nabla psi_i * nabla phi_j
+    
+                % Compute edge edge contribution to A
+                A(edof(i,j,k), edof(i,j,k)) = A(edof(i,j,k), edof(i,j,k)) + inner4(k); % nabla psi_i * nabla psi_i
+            end
+
+        end
+        
+        % Compute the contributions to B (edge and interior contribution only)
+        % only for k=1, since p is scalar
+        for j = 1:3
+            DPsi_j = div_psi(mesh, mesh.t(:, i), mesh.e(:, i), j);
+            inner5 = inner_prod(DPsi_j, @(x) zeros_like(x), mesh, mesh.t(:, t));
+            B(mesh.edof(i,j,1), mesh.idof(i,1)) = B(mesh.edof(i,j,1), mesh.idof(i,1)) + inner5; % (nabla * psi_i) phi_j
+        end
+    end
 end
 
 % TODO: Assembly loop
