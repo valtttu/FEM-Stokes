@@ -10,7 +10,7 @@ function [A,B] = assembly_stokes(mesh,T,E)
     edof = mesh.edof;
     for i = 1:Nt
         GPhi = grad_phi(mesh, mesh.t(:, i));
-        GPsi = grad_psi(mesh, mesh.t(:, i), mesh.e(:, i));
+        GPsi = grad_psi(mesh, mesh.t(:, i), mesh.edges(:, i));
 
         inner1 = inner_prod(GPhi, GPhi, mesh, mesh.t(:, i));
         inner2 = inner_prod(GPhi, GPsi, mesh, mesh.t(:, i));
@@ -34,7 +34,7 @@ function [A,B] = assembly_stokes(mesh,T,E)
         % Compute the contributions to B (edge and interior contribution only)
         % only for k=1, since p is scalar
         for j = 1:3
-            DPsi_j = div_psi(mesh, mesh.t(:, i), mesh.e(:, i), j);
+            DPsi_j = div_psi(mesh, mesh.t(:, i), mesh.edges(:, i), j);
             inner5 = inner_prod(DPsi_j, @(x) zeros_like(x), mesh, mesh.t(:, t));
             B(mesh.edof(i,j,1), mesh.idof(i,1)) = B(mesh.edof(i,j,1), mesh.idof(i,1)) + inner5; % (nabla * psi_i) phi_j
         end
