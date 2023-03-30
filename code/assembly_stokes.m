@@ -4,8 +4,8 @@ function [A,B] = assembly_stokes(mesh)
     Ne = size(mesh.edges, 2);
     n = Nt + Ne; % The number of dof for u
 
-    A = zeros([2*n, 2*n]);
-    B = zeros([2*n, Nt]);
+    A = sparse(2*n, 2*n);
+    B = sparse(2*n, Nt);
     idof = mesh.idof;
     edof = mesh.edof;
     for i = 1:Nt
@@ -24,8 +24,10 @@ function [A,B] = assembly_stokes(mesh)
                 A(idof(i,k), edof(i,j,k)) = A(idof(i,k), edof(i,j,k)) + inner2; % nabla phi_i * nabla psi_j
                 A(edof(i,j,k), idof(i,k)) = A(edof(i,j,k), idof(i,k)) + inner3; % nabla psi_i * nabla phi_j
     
+
                 % Compute edge edge contribution to A
-                A(edof(i,j,k), edof(i,j,k)) = A(edof(i,j,k), edof(i,j,k)) + inner4; % nabla psi_i * nabla psi_i
+                %A(edof(i,j,k), edof(i,j,k)) = A(edof(i,j,k), edof(i,j,k)) + inner4; % nabla psi_i * nabla psi_i
+                A(edof(i,j,k), edof(i,j,k)) = inner4;
             end
 
         end
@@ -33,8 +35,9 @@ function [A,B] = assembly_stokes(mesh)
         % Compute the contributions to B (edge and interior contribution only)
         % only for k=1, since p is scalar
         for j = 1:3
-            DPsi_j = div_psi(mesh, i, mesh.t2e(j, i), 1);
-            inner5 = inner_prod(DPsi_j, @(x) ones(size(x,2)), mesh, i);
+            DPsi_j1 = div_psi(mesh, i, mesh.t2e(j, i), 1);
+            DPsi_j2 = div_psi(mesh, i, mesh.t2e(j, i), 2);
+            inner5 = inner_prod(DPsi_j1, @(x) ones(size(x,2)), mesh, i) + inner_prod(DPsi_j2, @(x) ones(size(x,2)), mesh, i);
             B(mesh.edof(i,j,1), mesh.idof(i,1)) = B(mesh.edof(i,j,1), mesh.idof(i,1)) + inner5; % (nabla * psi_i) phi_j
         end
     end
