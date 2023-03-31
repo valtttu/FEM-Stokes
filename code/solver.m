@@ -21,7 +21,7 @@ bvals = mesh.bvals;
 iidof = setdiff(1:(2*n + Nt), bdof);
 M = [A, -B; B', 0.0001.*eye(Nt)];
 b = [ones([2*n,1]); zeros([Nt,1])]; % Set divergence to zero with latter zeros
-u(iidof) = M(iidof, iidof)\ b(iidof);
+u(iidof) = M(iidof, iidof)\b(iidof);
 u(bdof) = bvals;
 
 

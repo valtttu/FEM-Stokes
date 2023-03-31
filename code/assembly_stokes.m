@@ -26,8 +26,7 @@ function [A,B] = assembly_stokes(mesh)
     
 
                 % Compute edge edge contribution to A
-                %A(edof(i,j,k), edof(i,j,k)) = A(edof(i,j,k), edof(i,j,k)) + inner4; % nabla psi_i * nabla psi_i
-                A(edof(i,j,k), edof(i,j,k)) = inner4;
+                A(edof(i,j,k), edof(i,j,k)) = A(edof(i,j,k), edof(i,j,k)) + inner4; % nabla psi_i * nabla psi_i
             end
 
         end
@@ -35,10 +34,11 @@ function [A,B] = assembly_stokes(mesh)
         % Compute the contributions to B (edge and interior contribution only)
         % only for k=1, since p is scalar
         for j = 1:3
-            DPsi_j1 = div_psi(mesh, i, mesh.t2e(j, i), 1);
-            DPsi_j2 = div_psi(mesh, i, mesh.t2e(j, i), 2);
-            inner5 = inner_prod(DPsi_j1, @(x) ones(size(x,2)), mesh, i) + inner_prod(DPsi_j2, @(x) ones(size(x,2)), mesh, i);
-            B(mesh.edof(i,j,1), mesh.idof(i,1)) = B(mesh.edof(i,j,1), mesh.idof(i,1)) + inner5; % (nabla * psi_i) phi_j
+            for k = 1:2
+                DPsi_j = div_psi(mesh, i, mesh.t2e(j, i), k);
+                inner5 = inner_prod(DPsi_j, @(x) ones(size(x,2)), mesh, i);
+                B(edof(i,j,k), idof(i,1)) = B(edof(i,j,k), idof(i,1)) + inner5; % (nabla * psi_i) phi_j
+            end
         end
     end
 end
@@ -86,7 +86,7 @@ function absT = triangle_area(mesh,T)
     edge_coord = mesh.p(:,mesh.t(:,T));
     edge_vector1 = edge_coord(:,2) - edge_coord(:,1);
     edge_vector2 = edge_coord(:,3) - edge_coord(:,1);
-    absT = det([edge_vector1, edge_vector2]);
+    absT = abs(det([edge_vector1, edge_vector2]));
 end
 
 function outward_normal = edge_normal(mesh,T,E)
