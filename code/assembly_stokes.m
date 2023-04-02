@@ -1,4 +1,4 @@
-function [A,B] = assembly_stokes(mesh)
+function [A,B,F] = assembly_stokes(mesh, f)
     % The number of elements
     Nt = size(mesh.t, 2);
     Ne = size(mesh.edges, 2);
@@ -6,6 +6,7 @@ function [A,B] = assembly_stokes(mesh)
 
     A = sparse(2*n, 2*n);
     B = sparse(2*n, Nt);
+    F = zeros([2*n + Nt, 1]);
     idof = mesh.idof;
     edof = mesh.edof;
     for i = 1:Nt
@@ -28,6 +29,9 @@ function [A,B] = assembly_stokes(mesh)
                 % Compute edge edge contribution to A
                 A(edof(i,j,k), edof(i,j,k)) = A(edof(i,j,k), edof(i,j,k)) + inner4; % nabla psi_i * nabla psi_i
             end
+
+            % Compute the RHS
+            F(idof(i,k)) = inner_prod(f{k}, @(x) ones(size(x,2)), mesh, i);
 
         end
         

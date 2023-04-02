@@ -78,6 +78,8 @@ function mesh = build_mesh(path, N)
                 % Append the set of all outer edge indices
                 bdof(end+1) = mesh.edof(ti,ei,1);
                 bdof(end+1) = mesh.edof(ti,ei,2);
+                %bdof(end+1) = mesh.idof(ti,1);
+                %bdof(end+1) = mesh.idof(ti,2);
         
                 % Set the bounary values
                 x = mean(mesh.p(1,out_edges(:,eind)));
