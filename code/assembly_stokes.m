@@ -132,5 +132,5 @@ function res = hannukainen_quad2(a, b, mesh, T)
     t = vertices + 1/2 * (next-vertices);
     w = triangle_area(mesh, T)*[1/3 1/3 1/3];
     % Operate
-    res = w*(a(t).*b(t))';
+    res = w*(sum(a(t).*b(t), 1)');
 end
