@@ -31,7 +31,7 @@ function [A,B,F] = assembly_stokes(mesh, f)
             end
 
             % Compute the RHS
-            F(idof(i,k)) = inner_prod(f{k}, @(x) ones(size(x,2)), mesh, i);
+            F(idof(i,k)) = inner_prod(f{k}, @(x) norm(x)*0+1, mesh, i);
 
         end
         
@@ -40,7 +40,7 @@ function [A,B,F] = assembly_stokes(mesh, f)
         for j = 1:3
             for k = 1:2
                 DPsi_j = div_psi(mesh, i, mesh.t2e(j, i), k);
-                inner5 = inner_prod(DPsi_j, @(x) ones(size(x,2)), mesh, i);
+                inner5 = inner_prod(DPsi_j, @(x) norm(x)*0+1, mesh, i);
                 B(edof(i,j,k), idof(i,1)) = B(edof(i,j,k), idof(i,1)) + inner5; % (nabla * psi_i) phi_j
             end
         end
@@ -70,15 +70,18 @@ end
 
 function res = grad_phi(mesh,T) % triangle inside
     x_T = centroid(mesh,T);
-    C_T = @(x) 2*triangle_area(mesh,T) / norm(x-x_T)^2;
-    res = @(x) -C_T(x) * (x-x_T);
+    absT = triangle_area(mesh,T);
+    f = @(x) x-x_T;
+    C_T = 2*absT / inner_prod(f,f,mesh,T);
+    res = @(x) -C_T * (x-x_T);
 end
 
 function res = grad_psi(mesh,T,E)
     x_T = centroid(mesh,T);
     absT = triangle_area(mesh,T);
-    C_T = @(x) 2*absT / norm(x-x_T)^2;
-    res = @(x) C_T(x)/3 * (x-x_T) + edge_length(mesh,E)/absT * edge_normal(mesh,T,E);
+    f = @(x) x-x_T;
+    C_T = 2*absT / inner_prod(f,f,mesh,T);
+    res = @(x) C_T/3 * (x-x_T) + edge_length(mesh,E)/absT * edge_normal(mesh,T,E);
 end
 
 function c = centroid(mesh,T)
@@ -90,7 +93,7 @@ function absT = triangle_area(mesh,T)
     edge_coord = mesh.p(:,mesh.t(:,T));
     edge_vector1 = edge_coord(:,2) - edge_coord(:,1);
     edge_vector2 = edge_coord(:,3) - edge_coord(:,1);
-    absT = abs(det([edge_vector1, edge_vector2]));
+    absT = 0.5*abs(det([edge_vector1, edge_vector2]));
 end
 
 function outward_normal = edge_normal(mesh,T,E)
