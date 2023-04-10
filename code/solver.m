@@ -26,11 +26,14 @@ g = {@(x) 2*pi.*sin(pi*x(1,:)).*sin(pi*x(1,:)).*sin(pi*x(2,:)).*cos(pi*x(2,:));.
 % Construct the saddle point system
 bdof = mesh.bdof;
 bvals = mesh.bvals;
+bvals = 0*bvals;  % Solve with zero bc or cavity (commented)
+%F = 0*F;          % Solve with cavity or paper load function (commented)
 iidof = setdiff(1:(2*n + Nt), bdof);
-M = [A, -B; B', 0.0001.*eye(Nt)];
+u = zeros(2*n + Nt,1);
+M = [A, -B; B', 0.0000001.*eye(Nt)];
 b = [zeros([2*n,1]); zeros([Nt,1])]; % Set divergence to zero with latter zeros
-u(iidof) = M(iidof, iidof)\F(iidof);
-u(bdof) = 1*bvals;
+u(iidof) = M(iidof, iidof)\(F(iidof) - M(iidof,bdof)*bvals');
+u(bdof) = bvals;
 
 
 % Plot the solution and the mesh
@@ -52,3 +55,5 @@ hold on;
 plot_2Dtri_mesh(mesh);
 quiver(X, Y, f{1}([X(:)';Y(:)']), f{2}([X(:)';Y(:)']));
 title('Load function');
+
+figure(1);
