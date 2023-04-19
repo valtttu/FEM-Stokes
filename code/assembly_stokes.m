@@ -1,3 +1,11 @@
+% Assembly happens about like this:
+
+% GP1 = grad_psi(mesh,T1,E1)
+% GP2 = grad_psi(mesh,T2,E2)
+% A_{i,j} = inner_prod(GP1,GP2,mesh,T1)
+
+% GP1 and GP2 are function handles, and T1, T2, E1, E2 correspond to basis functions i and j
+
 function [A,B,F] = assembly_stokes(mesh, f)
     % The number of elements
     Nt = size(mesh.t, 2);
@@ -9,6 +17,8 @@ function [A,B,F] = assembly_stokes(mesh, f)
     F = zeros([2*n + Nt, 1]);
     idof = mesh.idof;
     edof = mesh.edof;
+
+    % Assembly loop
     for i = 1:Nt
         GPhi = grad_phi(mesh, i);
         inner1 = inner_prod(GPhi, GPhi, mesh, i);
@@ -47,15 +57,7 @@ function [A,B,F] = assembly_stokes(mesh, f)
     end
 end
 
-% TODO: Assembly loop
-
-% Assembly happens about like this:
-
-% GP1 = grad_psi(mesh,T1,E1)
-% GP2 = grad_psi(mesh,T2,E2)
-% A_{i,j} = inner_prod(GP1,GP2,mesh,T1)
-
-% GP1 and GP2 are function handles, and T1, T2, E1, E2 correspond to basis functions i and j
+% Definitions for gradients and divergences + auxiliary functions
 
 function res = div_phi()
     res = @(x) 0;
@@ -126,6 +128,17 @@ function res = inner_prod(a,b,mesh,T) % int_T a' * b dx
         a(qpts(:,2))' * b(qpts(:,2)) +...
         a(qpts(:,3))' * b(qpts(:,3));
     res = A * triangle_area(mesh,T) / 3;
+end
+
+function res = inner_prod_edge(a,b,mesh,E) % int_dT a' * b dx 
+    edge_coord = mesh.p(:,mesh.edges(:,E));
+    qpts = edge_coord(:,1) + (edge_coord(:,2) - edge_coord(:,1)).*(0:0.1:1);
+    n = size(qpts,2);
+    A = 0;
+    for i=1:n
+        A = A + a(qpts(:,i))' * b(qpts(:,i));
+    end
+    res = A * edge_length(mesh, E)/n;
 end
 
 function res = hannukainen_quad2(a, b, mesh, T)

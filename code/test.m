@@ -7,7 +7,7 @@ close all;
 % Option 1: Rect mesh on (0,1)^2
 %mesh = make_rect_mesh(1);
 % Option 2: A more complex mesh from input file
-mesh = build_mesh('./domains/cavity_domain.txt',2);
+mesh = build_mesh('./domains/snake_domain.txt',2);
 
 % The number of elements
 Nt = size(mesh.t, 2);

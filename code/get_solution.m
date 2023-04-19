@@ -34,6 +34,9 @@ function [X, Y, U, V, p] = get_solution(u, mesh)
         V(end+1) = u(mesh.idof(ti,2));
         p(end+1) = u(2*n+mesh.idof(ti,1));
 
+    end
+
+    for ti = 1:Nt
         % Edges -> mid-point of the edge
         for ei = 1:3
             eind = mesh.edges(:,mesh.t2e(ei,ti));
@@ -43,14 +46,13 @@ function [X, Y, U, V, p] = get_solution(u, mesh)
             U(end+1) = u(mesh.edof(ti,ei,1));
             V(end+1) = u(mesh.edof(ti,ei,2));
         end
-
     end
 
-    M = [X;Y;U;V];
-    M = unique(M','rows')';
-    X = M(1,:);
-    Y = M(2,:);
-    U = M(3,:);
-    V = M(4,:);
+%     M = [X;Y;U;V];
+%     M = unique(M','rows')';
+%     X = M(1,:);
+%     Y = M(2,:);
+%     U = M(3,:);
+%     V = M(4,:);
 
 end

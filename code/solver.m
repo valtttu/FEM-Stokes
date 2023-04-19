@@ -1,10 +1,10 @@
-% Run the whole solver for cavity problem
+% Run the whole solver
 
 clear all;
 close all;
 
 % Build the mesh
-mesh = build_mesh('./domains/cavity_domain.txt',4);
+mesh = build_mesh('./domains/square_domain.txt',4);
 
 % The number of elements
 Nt = size(mesh.t, 2);
@@ -26,11 +26,10 @@ g = {@(x) 2*pi.*sin(pi*x(1,:)).*sin(pi*x(1,:)).*sin(pi*x(2,:)).*cos(pi*x(2,:));.
 % Construct the saddle point system
 bdof = mesh.bdof;
 bvals = mesh.bvals;
-bvals = 0*bvals;  % Solve with zero bc or cavity (commented)
-%F = 0*F;          % Solve with cavity or paper load function (commented)
+bvals = bvals;
 iidof = setdiff(1:(2*n + Nt), bdof);
 u = zeros(2*n + Nt,1);
-M = [A, -B; B', 0.0000001.*eye(Nt)];
+M = [A, -B; B', (1e-6).*eye(Nt)];
 b = [zeros([2*n,1]); zeros([Nt,1])]; % Set divergence to zero with latter zeros
 u(iidof) = M(iidof, iidof)\(F(iidof) - M(iidof,bdof)*bvals');
 u(bdof) = bvals;
@@ -41,13 +40,13 @@ u(bdof) = bvals;
 figure()
 hold on;
 plot_2Dtri_mesh(mesh);
-quiver(X, Y, U, V);
+quiver(X, Y, U, V, 1);
 title('Stokes solver')
 
 figure();
 hold on;
 plot_2Dtri_mesh(mesh);
-quiver(X, Y, g{1}([X(:)';Y(:)']), g{2}([X(:)';Y(:)']));
+quiver(X, Y, g{1}([X(:)';Y(:)']), g{2}([X(:)';Y(:)']),1);
 title('Analytic solution');
 
 figure();
@@ -55,5 +54,14 @@ hold on;
 plot_2Dtri_mesh(mesh);
 quiver(X, Y, f{1}([X(:)';Y(:)']), f{2}([X(:)';Y(:)']));
 title('Load function');
+
+% Plot the pressure - still needs some work to plot triangles
+figure();
+imagesc(unique(X(1:Nt)), unique(Y(1:Nt)), reshape(p,[2*sqrt(Nt/2),sqrt(Nt/2)]));
+set(gca,'YDir','normal')
+xlabel('x');
+ylabel('y');
+colorbar();
+axis tight equal
 
 figure(1);
