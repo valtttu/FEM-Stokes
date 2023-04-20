@@ -22,7 +22,7 @@ function [X, Y, U, V, p] = get_solution(u, mesh)
     Y = [];
     U = [];
     V = [];
-    p = [];
+    p = u(end-Nt:end); % This way order of u correponds to element inds
 
     for ti = 1:Nt
         % Interior -> centroid
@@ -32,7 +32,6 @@ function [X, Y, U, V, p] = get_solution(u, mesh)
         Y(end+1) = c(2);
         U(end+1) = u(mesh.idof(ti,1));
         V(end+1) = u(mesh.idof(ti,2));
-        p(end+1) = u(2*n+mesh.idof(ti,1));
 
     end
 
@@ -48,11 +47,5 @@ function [X, Y, U, V, p] = get_solution(u, mesh)
         end
     end
 
-%     M = [X;Y;U;V];
-%     M = unique(M','rows')';
-%     X = M(1,:);
-%     Y = M(2,:);
-%     U = M(3,:);
-%     V = M(4,:);
 
 end

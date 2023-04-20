@@ -41,27 +41,40 @@ figure()
 hold on;
 plot_2Dtri_mesh(mesh);
 quiver(X, Y, U, V, 1);
-title('Stokes solver')
+title('Stokes solver');
+xlabel('x');
+ylabel('y');
+xlim([min(X), max(X)]);
+ylim([min(Y), max(Y)]);
 
 figure();
 hold on;
 plot_2Dtri_mesh(mesh);
 quiver(X, Y, g{1}([X(:)';Y(:)']), g{2}([X(:)';Y(:)']),1);
 title('Analytic solution');
+xlabel('x');
+ylabel('y');
+xlim([min(X), max(X)]);
+ylim([min(Y), max(Y)]);
 
 figure();
 hold on;
 plot_2Dtri_mesh(mesh);
 quiver(X, Y, f{1}([X(:)';Y(:)']), f{2}([X(:)';Y(:)']));
 title('Load function');
+xlabel('x');
+ylabel('y');
+xlim([min(X), max(X)]);
+ylim([min(Y), max(Y)]);
 
 % Plot the pressure - still needs some work to plot triangles
 figure();
-imagesc(unique(X(1:Nt)), unique(Y(1:Nt)), reshape(p,[2*sqrt(Nt/2),sqrt(Nt/2)]));
-set(gca,'YDir','normal')
+hold on;
+for i = 1:Nt
+    patch(mesh.p(1,mesh.t(:,i)),mesh.p(2,mesh.t(:,i)),p(i));
+end
 xlabel('x');
 ylabel('y');
 colorbar();
-axis tight equal
 
 figure(1);
