@@ -6,7 +6,7 @@
 
 % GP1 and GP2 are function handles, and T1, T2, E1, E2 correspond to basis functions i and j
 
-function [A,B,F] = assembly_stokes(mesh, f)
+function [A,B,F,absT] = assembly_stokes(mesh, f)
     % The number of elements
     Nt = size(mesh.t, 2);
     Ne = size(mesh.edges, 2);
@@ -15,6 +15,7 @@ function [A,B,F] = assembly_stokes(mesh, f)
     A = sparse(2*n, 2*n);
     B = sparse(2*n, Nt);
     F = zeros([2*n + Nt, 1]);
+    absT = zeros([1,Nt]);
     idof = mesh.idof;
     edof = mesh.edof;
 
@@ -28,16 +29,19 @@ function [A,B,F] = assembly_stokes(mesh, f)
         
             % Compute edge contribution to A from T_i and edges of T_i
             for j = 1:3
-                GPsi = grad_psi(mesh, i, mesh.t2e(j, i));
-                inner2 = inner_prod(GPhi, GPsi, mesh, i);
-                inner3 = inner_prod(GPsi, GPhi, mesh, i);
-                inner4 = inner_prod(GPsi, GPsi, mesh, i);
+                GPsi_j = grad_psi(mesh, i, mesh.t2e(j, i));
+                inner2 = inner_prod(GPhi, GPsi_j, mesh, i);
+                inner3 = inner_prod(GPsi_j, GPhi, mesh, i);
                 A(idof(i,k), edof(i,j,k)) = A(idof(i,k), edof(i,j,k)) + inner2; % nabla phi_i * nabla psi_j
                 A(edof(i,j,k), idof(i,k)) = A(edof(i,j,k), idof(i,k)) + inner3; % nabla psi_i * nabla phi_j
     
 
                 % Compute edge edge contribution to A
-                A(edof(i,j,k), edof(i,j,k)) = A(edof(i,j,k), edof(i,j,k)) + inner4; % nabla psi_i * nabla psi_i
+                for l = 1:3
+                    GPsi_l = grad_psi(mesh, i, mesh.t2e(l, i));
+                    inner4 = inner_prod(GPsi_j, GPsi_l, mesh, i);
+                    A(edof(i,j,k), edof(i,l,k)) = A(edof(i,j,k), edof(i,l,k)) + inner4; % nabla psi_i * nabla psi_i
+                end
             end
 
             % Compute the RHS
@@ -55,6 +59,9 @@ function [A,B,F] = assembly_stokes(mesh, f)
             end
         end
     end
+
+    % Compute and save triangle area
+    absT(i) = triangle_area(mesh, i);
 end
 
 % Definitions for gradients and divergences + auxiliary functions
