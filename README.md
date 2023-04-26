@@ -2,7 +2,7 @@
 
 >This repo contains `MATLAB` implementation for Weak Galerkin FEM solver that can be used to solve the steady-state Stokes problem in 2D. The solver was implemented as a project for course *MS-E1653 Finite Element Method* in Aalto University, but it did not work initially. After a lot of debugging with the help of professors Antti Hannukainen (Aalto University Math) and Lin Mu (University of Georgia Math), the solver finally started working. So, thanks for both of them for their help!
 
-## The problem describtion
+## The problem description
 
 Steady-state Stokes problem in 2D is as follows
 ```math
@@ -12,17 +12,17 @@ Steady-state Stokes problem in 2D is as follows
     \mathbf{u} &= \mathbf{g},\quad \mathrm{in\ } \partial\Omega\,
 \end{align*}
 ```
-where $\mathbf{u}$ is the velocity field, $p$ is the pressure field, $\mathbf{g}$ defines the Dirichlet type boundary condition (usually constant) and $\mathbf{f}$ is the load function. The weak formulation for the above problem is
+where $\mathbf{u}$ is the velocity field, $p$ is the pressure field, $\mathbf{g}$ defines the Dirichlet type boundary condition (usually constant) and $\mathbf{f}$ is the load function. The weak formulation for the above problem with $\mathbf{g}=0$ is
 ```math
 \begin{align*}
     (\nabla \mathbf{u}, \nabla\mathbf{v}) - (\nabla \cdot \mathbf{v}, p) &= (\mathbf{f}, \mathbf{v}),\quad \mathbf{v} \in [H^1_0(\Omega)]^2\\
     (\nabla \cdot \mathbf{u}, q) &= 0,\quad q \in L^2_0(\Omega)\,.
 \end{align*}
 ```
-As we use Weak Galerkin finite element method, we use weak gradient operator $\nabla_w$ and a discontinuous FE-space with piecewise constant basis functions. Thus the FE-spaces are
+As we use Weak Galerkin finite element method, we use weak gradient operator $\nabla_w$ and a discontinuous FE-space with piecewise constant basis functions. Thus the FE-spaces for velocity and pressure are
 ```math
 \begin{align*}
-    V_h &= \{ \mathbf{v} = \{\mathbf{v_0}, \mathbf{v_b}:\ \mathbf{v_0}|_T \in [P_0(T)]^2,\ \mathbf{v_b}|_e \in [P_0(T)]^2,\ e \subset \partial T,\ T \in \tau_h \} \\
+    V_h &= \{ \mathbf{v} = \{\mathbf{v_0}, \mathbf{v_b}\}:\ \mathbf{v_0}|_T \in [P_0(T)]^2,\ \mathbf{v_b}|_e \in [P_0(T)]^2,\ e \subset \partial T,\ T \in \tau_h \} \\
 	W_h &= \{ q \in L^2_0(\Omega): \ q|_T \in P_0(T),\ T \in \tau_h \}\,,
 \end{align*}
 ```
