@@ -65,7 +65,7 @@ The analytic solution is plotted below and we can see that the solutions match e
 
 ![FE-solution](./Figs/ex1_analytic_solution.jpg)
 
-Lastly, the we tested the performance against the computational fluid dynamics stanrad problem, e.g. lid-driven cavity ($\mathbf{f}=0,\ \mathbf{u}(x,1)=1, \mathbf{u}(0,y)=\mathbf{u}(1,y)=\mathbf{u}(x,0)=0$). The resulting velocity magnitude field is shown below:
+Lastly, the we tested the performance against the computational fluid dynamics standard problem, e.g. lid-driven cavity ($\mathbf{f}=0,\ \mathbf{u}(x,1)=1, \mathbf{u}(0,y)=\mathbf{u}(1,y)=\mathbf{u}(x,0)=0$). The resulting velocity magnitude field is shown below:
 
 ![FE-solution](./Figs/cavity_umag.jpg)
 

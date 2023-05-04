@@ -4,7 +4,7 @@ clear all;
 close all;
 
 % Build the mesh
-mesh = build_mesh(['./domains/square_domain.txt'],5);
+mesh = build_mesh(['./domains/square_domain.txt'],4);
 
 % The number of elements
 Nt = size(mesh.t, 2);
